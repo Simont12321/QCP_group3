@@ -6,7 +6,7 @@ class DenseMatrix():
         """
         Input
         ------
-        A numpy array
+        A numpy array 
         """
 
         self.inputArray = inputArray 
