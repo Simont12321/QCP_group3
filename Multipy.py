@@ -22,6 +22,9 @@ class Multiply():
 
     def denseMultiply(self):
         """
+       
+        The denseMultiply function is now a function in the DenseMatrix class. 
+       
         Input
         ------
         Two numpy matrices, which can be inputted as numpy arrays. 
@@ -33,8 +36,8 @@ class Multiply():
 
         """
 
-        product = np.asmatrix(self.matrix1) * np.asmatrix(self.matrix2)
-        return np.asarray(product) 
+        # product = np.asmatrix(self.matrix1) * np.asmatrix(self.matrix2)
+        # return np.asarray(product) 
 
     def sparceMultiply(self):
         """

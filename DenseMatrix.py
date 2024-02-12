@@ -8,6 +8,9 @@ class DenseMatrix():
         ------
         A numpy array 
         """
+        if not isinstance(inputArray, np.ndarray):
+            print(f"Warning, had to convert DenseMatrix primary input from a {type(inputArray)} into a numpy array.") 
+            inputArray = np.array(inputArray)
 
         self.inputArray = inputArray 
         self.shape = np.shape(inputArray) 
@@ -23,6 +26,8 @@ class DenseMatrix():
         Nothing, modifies the original matrix. 
         """
 
+        assert isinstance(factor, (int, float)), "DenseMatrix scale method expects an int or flaot input scalar."
+
         self.inputArray = np.asmatrix(self.inputArray) * factor
 
     def multiply(self, matrix2):
@@ -36,7 +41,9 @@ class DenseMatrix():
         The product of the two input matrices as a DenseMatrix. 
         """
 
-        product = np.asmatrix(self.inputArray) * np.asmatrix(matrix2)
+        assert isinstance(matrix2, DenseMatrix), "DenseMatrix multiply method expects DenseMatrix input."
+
+        product = np.asmatrix(self.inputArray) * np.asmatrix(matrix2.inputArray)
         array = np.asarray(product) 
         return DenseMatrix(array)
 
@@ -47,8 +54,13 @@ class DenseMatrix():
 if __name__ == "__main__":
     a = np.array([[3,0,1],[1,0,0],[0,0,6]])
     b = 2
+    c = [[3,0,1],[1,0,0],[0,0,6]] 
 
     matrixA = DenseMatrix(a) 
-    print(matrixA) 
+    matrixA.scale(b)
+    print(matrixA)
 
-    print(matrixA.scale(b))
+    matrixC = DenseMatrix(c)
+
+    product = matrixA.multiply(matrixC)
+    print(product)
