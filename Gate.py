@@ -5,9 +5,12 @@ import DenseMatrix
 
 class Gate(object):
     
-    def __init__(self, matrixType, quBit, gateName, customInput = None):
+    def __init__(self, matrixType, quBitOne, gateName, quBitTwo = None, customInput = None):
     
-        self.quBit = quBit
+        #Store the one (or two) quBits we're acting on
+        self.quBitOne = quBitOne
+        self.quBitTwo = quBitTwo
+        
         self.gateName = gateName
         self.customInput = customInput
         
