@@ -15,7 +15,7 @@ class Multiply():
         #    self.matrixType = "sparceMatrix"
         # else:
         #    raise Exception("Unexpected inputs.")
-        
+
         self.matrix1 = matrix1
         self.matrix2 = matrix2
         self.matrixType = matrixType
@@ -59,6 +59,13 @@ class Multiply():
                     result.append((self.matrix1[i][0],self.matrix1[i][1],product)) 
         
         return result
+
+    def scale(self, factor):
+        if type(factor) != int or type(factor) != float:
+            raise "Error, scale requires an integer or float input."
+
+        product = np.asmatrix(self.matrix1) * factor
+        return np.asarray(product) 
         
         
 
