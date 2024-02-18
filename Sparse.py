@@ -1,5 +1,4 @@
 import numpy as np
-from Dense import DenseMatrix
 class SparseMatrix(object):
 
     def __init__(self, n, elements):
@@ -62,7 +61,7 @@ class SparseMatrix(object):
         Dense = np.zeros((self.Dimension, self.Dimension), dtype = complex)
         for i in self.Elements:
             Dense[i[0]][i[1]] = i[2]
-        return DenseMatrix(Dense)
+        return Dense
 
     def __getitem__(self,index):
         """
@@ -73,6 +72,12 @@ class SparseMatrix(object):
             if i[0] == row and i[1] == column:
                 return(i[2])
         return(complex(0))
+    
+    def __str__(self):
+        print = ''
+        for i in self.Elements:
+            print += f'{i}\n'
+        return print
 
 Matrix = SparseMatrix(3,[(0,0,2),(1,2,3),(2,2,1)])
 NewMatrix = Matrix.Multiply(Matrix)
