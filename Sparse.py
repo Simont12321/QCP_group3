@@ -1,5 +1,5 @@
 import numpy as np
-from DenseMatrix import DenseMatrix
+from Dense import DenseMatrix
 class SparseMatrix(object):
 
     def __init__(self, n, elements):
@@ -50,7 +50,7 @@ class SparseMatrix(object):
     # Loop over matrix elements and vector elements to add to NewVector
 
         for elem in self.Elements:
-            NewVector[elem[0]] += (elem[2])*(Vector[elem[1]])
+            NewVector[elem[0]] += (elem[2])*(u[elem[1]])
         return(NewVector)
     
     def Dense(self):
