@@ -23,7 +23,7 @@ class Multiply():
     def denseMultiply(self):
         """
        
-        The denseMultiply function is now a function in the DenseMatrix class. 
+        The denseMultiply function is now a function in the DenseMatrix class!!! 
        
         Input
         ------
@@ -62,14 +62,6 @@ class Multiply():
                     result.append((self.matrix1[i][0],self.matrix1[i][1],product)) 
         
         return result
-
-    def scale(self, factor):
-        if type(factor) != int or type(factor) != float:
-            raise "Error, scale requires an integer or float input."
-
-        product = np.asmatrix(self.matrix1) * factor
-        return np.asarray(product) 
-        
         
 
 if __name__ == "__main__":
