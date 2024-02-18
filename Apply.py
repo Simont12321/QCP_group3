@@ -3,7 +3,7 @@
 # import SparseMatrix
 from time import time
 import numpy as np
-class Apply():
+class Apply(object):
     def __init__(self, VectorApply, ApplyType = None):
         # Check correct format
         assert isinstance(VectorApply, list)
