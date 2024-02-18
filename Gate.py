@@ -14,14 +14,14 @@ class Gate(object):
         self.gateName = gateName
         self.customInput = customInput
         
-        self.Gate = self.gateName()
-        
         if matrixType == "Dense":
             self.matrixType = DenseMatrix
        # elif matrixType == "Sparse":
        #     self.matrixType = SparseMatrix
        # elif matrixType == "Lazy":
        #     self.matrixType = LazyMatrix
+        
+        self.Gate = self.gateName()
         
     
     def hadamard(self):
