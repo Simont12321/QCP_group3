@@ -6,7 +6,7 @@ class DenseMatrix():
         """
         Input
         ------
-        A numpy array 
+        A numpy array. If input is not a numpy array it is converted and a warning message appears. 
         """
         if not isinstance(inputArray, np.ndarray):
             print(f"Warning, had to convert DenseMatrix primary input from a {type(inputArray)} into a numpy array.") 
@@ -26,7 +26,7 @@ class DenseMatrix():
         Nothing, modifies the original matrix. 
         """
 
-        assert isinstance(factor, (int, float)), "DenseMatrix scale method expects an int or flaot input scalar."
+        assert isinstance(factor, (int, float)), "DenseMatrix scale method expects an int or float input scalar."
 
         self.inputArray = np.asmatrix(self.inputArray) * factor
 
