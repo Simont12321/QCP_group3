@@ -1,6 +1,6 @@
-from Sparse import Sparse
-from Dense import Dense
-from Q_Register_file import Q_Register
+from Sparse import SparseMatrix
+from Dense import DenseMatrix
+from Q_Register_File import Q_Register
 from Gate_File import Gate
 import numpy as np
 
@@ -164,7 +164,7 @@ A = np.array([[1,1],[1,-1]])
 B = np.array([[1,1],[1,-1]]) 
 C = np.eye(2)
 
-ATensorB = Tensor([A,C,B])
+ATensorB = TensorProduct([A,C,B])
 
 print(ATensorB.denseTensorProduct())
 print(np.kron(np.kron(A,C),B))

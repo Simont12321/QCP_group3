@@ -1,7 +1,7 @@
 import numpy as np
 from Sparse import SparseMatrix
 from Dense import DenseMatrix
-from Lazy import LazyMatrix
+from LazyMatrix_File import LazyMatrix
 
 class Gate(object):
     
