@@ -1,7 +1,7 @@
 from Sparse import Sparse
 from Dense import Dense
 from Q_Register_file import Q_Register
-from Gate import Gate
+from Gate_File import Gate
 import numpy as np
 
 class TensorProduct(object):
