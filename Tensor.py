@@ -1,26 +1,31 @@
-#import State
-#import Gate
+import Sparse
+import Dense
+import Q_Register
+import Gate
 import numpy as np
 
 class Tensor(object):
     
-    def __init__(self, thingsToBeTensored, tensorType = None):
+    def __init__(self, thingsToBeTensored):
         
         assert isinstance(thingsToBeTensored, list), "The primary input for the tensor product method should be passed as a list."
         
         #Check that we're inputting only vectors or only matrices
-        #if(all(isinstance(vector, State.vector) for vector in self.thingsToBeTensored)):
-        #   self.productType = "Vectors"
-        #elif(all(isinstance(operator, Gate.operator) for operator in self.thingsToBeTensored)):
-        #   self.productType = "Operators"
-        #else:
-        #   raise Exception("The inputs for a tensor products should ALL be either vectors (states) or matrices (operators).")
+        if(all(isinstance(vector, Q_Register) for vector in self.thingsToBeTensored)):
+           self.productType = "Vectors"
+        elif(all(isinstance(operator, Gate) for operator in self.thingsToBeTensored)):
+           self.productType = "Operators"
+        else:
+           raise Exception("The inputs for a tensor products should ALL be either vectors (states) or matrices (operators).")
         
-        #I think I'll need an extra method for sparse matrices and maybe lazy ones too, hence the tensorType
-        self.tensorType = tensorType
+        if self.productType == "Operators" and thingsToBeTensored[0].matrixType == Sparse:
+            self.tensorProduct = self.sparseTensorProduct
+        else:
+            self.tensorProduct = self.denseTensorProduct
+        
         self.thingsToBeTensored = thingsToBeTensored
         
-    def tensorProduct(self):
+    def denseTensorProduct(self):
         """
         Initial naive implementation
         Based on the definition that for 2 matrices, A (n x m) and B (p x q), the tensor product is:
@@ -51,7 +56,7 @@ class Tensor(object):
         """
         
         #Initialise the product 
-        Product = self.thingsToBeTensored[0]
+        Product = self.thingsToBeTensored[0].inputArray
         
         for productNumber in range(1, len(self.thingsToBeTensored)):
             
@@ -62,7 +67,7 @@ class Tensor(object):
             yLengthB = self.thingsToBeTensored[productNumber].shape[1]
             
             #Following the notation of the docstring, Product is A, and self.thingsToBeTensored[productNumber] is B
-            BMatrix = self.thingsToBeTensored[productNumber]
+            BMatrix = self.thingsToBeTensored[productNumber].inputArray
             
             #Find the shape of the product
             newShape = (xLengthA * xLengthB, yLengthA * yLengthB)
@@ -85,10 +90,20 @@ class Tensor(object):
             Product = newProduct
             
         #Give the Product the correct type and return it
-        #if self.productType == "Vectors":
-        #   return State(Product)
-        #else:
-        #   return Gate(Product)
+        if self.productType == "Vectors":
+            
+            nQubits = np.log2(Product.shape[0])
+            
+            return Q_Register(nQubits, Product)
+        else:
+            
+            quBits = []
+            
+            for Gate in self.thingsToBeTensored:
+                
+                quBits.append(Gate.quBits)
+            
+            return Gate("Dense", quBits, customInput = Product)
         
         
         
@@ -98,10 +113,58 @@ class Tensor(object):
         
         return Product
     
-A = np.array([[1,-2],[3,6]])
-B = np.array([[3,5],[7,4]])
+    def sparseTensorProduct(self):
+        """
+        Implemenetation using sparse matrices.
+        Still based on the kronecker product.
+        
+        Assumes sparse matrices are input as lists of tuples [(i,j,M_ij)]
 
-ATensorB = Tensor([A,B])
+        Returns
+        -------
+        Product : The tensor product of the list thingsToBeTensored. 
+        
+        Output is of type operator or vector depending what is being tensored.
+        
 
-print(ATensorB.tensorProduct())
-print(np.kron(A,B))
+        """
+        
+        #Initialise the product 
+        Product = self.thingsToBeTensored[0]
+        
+        for productNumber in range(1, len(self.thingsToBeTensored)):
+            
+            BMatrix = self.thingsToBeTensored[productNumber]
+            
+            newShape = (Product.Dimension[0] * BMatrix.Dimension[0], Product.Dimension[1] * BMatrix.Dimension[1])
+            
+            newProduct = []
+            
+            for elementA in Product.elements:                
+                for elementB in BMatrix.elements:
+                    
+                    i = BMatrix.dimension[0] * elementA[0] + elementB[0]
+                    j = BMatrix.dimension[1] * elementA[1] + elementB[1]
+                    
+                    val = elementA * elementB
+                    
+                    newProduct.append((i,j,val))
+            
+            Product = newProduct
+          
+        quBits = []
+            
+        for Gate in self.thingsToBeTensored:
+                
+            quBits.append(Gate.quBits)
+          
+        return Gate("Sparse", quBits, customInput = Product) 
+    
+A = np.array([[1,1],[1,-1]])
+B = np.array([[1,1],[1,-1]]) 
+C = np.eye(2)
+
+ATensorB = Tensor([A,C,B])
+
+print(ATensorB.denseTensorProduct())
+print(np.kron(np.kron(A,C),B))
