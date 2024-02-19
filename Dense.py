@@ -1,3 +1,4 @@
+# written by Simon 
 import numpy as np
 from Sparse import SparseMatrix
 
