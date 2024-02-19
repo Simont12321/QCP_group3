@@ -1,10 +1,10 @@
-import Sparse
-import Dense
-import Q_Register
-import Gate
+from Sparse import Sparse
+from Dense import Dense
+from Q_Register_file import Q_Register
+from Gate import Gate
 import numpy as np
 
-class Tensor(object):
+class TensorProduct(object):
     
     def __init__(self, thingsToBeTensored):
         
@@ -18,7 +18,7 @@ class Tensor(object):
         else:
            raise Exception("The inputs for a tensor products should ALL be either vectors (states) or matrices (operators).")
         
-        if self.productType == "Operators" and thingsToBeTensored[0].matrixType == Sparse:
+        if self.productType == "Operators" and thingsToBeTensored[0].matrixType == SparseMatrix:
             self.tensorProduct = self.sparseTensorProduct
         else:
             self.tensorProduct = self.denseTensorProduct
