@@ -1,10 +1,10 @@
 import numpy as np
-# from Sparse import SparseMatrix
-# #from Dense import DenseMatrix
-# import Apply_File
-#import Gate
+from Sparse import SparseMatrix
+from Dense import DenseMatrix
+from Apply_File import Apply
+from Gate_File import Gate
 from Q_Register_File import Q_Register
-#import Tensor
+from Tensor import TensorProduct
 
 
 # initialize 2 qbit register 
