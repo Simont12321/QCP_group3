@@ -1,6 +1,6 @@
 import numpy as np
 #import SparseMatrix
-import DenseMatrix
+import Dense
 #import LazyMatrix
 
 class Gate(object):

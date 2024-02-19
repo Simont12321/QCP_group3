@@ -1,5 +1,5 @@
 import numpy as np
-import Apply
+import Apply_File
 
 H_gate = 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
 
@@ -32,7 +32,7 @@ class Qubit:
         gate (2D array) : square matrix repesentig a quantum gate (lin operator)
         """
 
-        temp = Apply([gate, self.state])
+        temp = Apply_File([gate, self.state])
         self.state = temp.DenseApply()
 
     def measure(self):
