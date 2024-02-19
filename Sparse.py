@@ -73,6 +73,10 @@ class SparseMatrix(object):
                 return(i[2])
         return(complex(0))
     
+    def __setitem__(self, index, newValue):
+        if newValue != 0:
+            self.Elements.append((*index, newValue))
+    
     def __str__(self):
         print = ''
         for i in self.Elements:
