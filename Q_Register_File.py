@@ -1,5 +1,6 @@
 import numpy as np
 import Apply_File
+# from Tensor import TensorProduct
 
 H_gate = 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
 
@@ -60,15 +61,27 @@ class Q_Register:
         Args:
         n (int) : number of qubits
         """
+        self.state = np.zeros(2**n, dtype=complex)
         temp = []
+
         if np.all(states) == None:
             for i in range(n):
+
                 temp.append(Qubit())
+
+            self.state[0] = 1
+
         else:
+            semiProd = np.array([1])
+            to_tens_prod = []
             for i in range(n):
 
                 temp.append(Qubit(states[2*i: 2*(i+1)]))
+                to_tens_prod.append(temp[i].state)
+                semiProd = np.kron(semiProd, temp[i].state)
 
+            # self.state = TensorProduct(to_tens_prod).denseTensorProduct()
+            self.state = semiProd.copy()
         self.qubits = np.array(temp)
 
     def apply_gate(self, gate, index):
@@ -82,6 +95,8 @@ class Q_Register:
         Returns:
         ND matrix where N is the initial number of qubits
         """
+
+        # TODO: how do are we gonna differ between 1 bit and 2 bit gates? have 2 sep methods ?
         pass
 
     def measure(self):
@@ -92,7 +107,7 @@ class Q_Register:
         for q in self.qubits:
             q.measure()
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # basically converts self.qubits to self.state
         # prints the Q_Register as 1D array
         out = f""
         for x in self.qubits:
@@ -102,8 +117,8 @@ class Q_Register:
 
 a = np.array([1+1j, 2+2j], dtype=complex)
 b = np.array([3+3j, 4+4j], dtype=complex)
-q = Q_Register(4, np.array([1.+1.j, 1.+1.j, 2.+2.j, 2.+2.j,
-               3.+3.j, 3.+3.j, 4.+4.j, 4.+4.j]))
+q = Q_Register(4, np.array([1+0j, 0j, 1+0j, 0j, 1+0j, 0j, 1+0j, 0j]))
 print(q)
+print(q.state)
 q.measure()
 print(q)
