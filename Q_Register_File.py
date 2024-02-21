@@ -1,7 +1,7 @@
 import numpy as np
 from Apply_File import Apply
 from Gate_File import Gate
-# from Tensor import TensorProduct
+from Tensor import TensorProduct
 
 H_gate = 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
 
@@ -74,16 +74,16 @@ class Q_Register:
             self.state[0] = 1
 
         else:
-            semiProd = np.array([1])
+            # semiProd = np.array([1])
             to_tens_prod = []
             for i in range(n):
 
                 temp.append(Qubit(states[2*i: 2*(i+1)]))
                 to_tens_prod.append(temp[i].state)
-                semiProd = np.kron(semiProd, temp[i].state)
+                # semiProd = np.kron(semiProd, temp[i].state)
 
-            # self.state = TensorProduct(to_tens_prod).denseTensorProduct()
-            self.state = semiProd.copy()
+            self.state = TensorProduct(to_tens_prod).denseTensorProduct()
+            self.state = np.squeeze(self.state)
         self.qubits = np.array(temp)
 
     def apply_gate(self, gate: Gate, index):
