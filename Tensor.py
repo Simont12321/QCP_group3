@@ -11,9 +11,9 @@ class TensorProduct(object):
             thingsToBeTensored, list), "The primary input for the tensor product method should be passed as a list."
 
         # Check that we're inputting only vectors or only matrices
-        if (all(isinstance(matrix, np.ndarray) for matrix in thingsToBeTensored)):
+        if (all(isinstance(matrix, DenseMatrix) for matrix in thingsToBeTensored)):
             self.tensorProduct = self.denseTensorProduct
-        elif (all(isinstance(matrix, list) for matrix in thingsToBeTensored)):
+        elif (all(isinstance(matrix, SparseMatrix) for matrix in thingsToBeTensored)):
             self.tensorProduct = self.sparseTensorProduct
         else:
             raise Exception(
@@ -52,26 +52,26 @@ class TensorProduct(object):
         """
 
         # Initialise the product
-        Product = self.thingsToBeTensored[0]
+        Product = self.thingsToBeTensored[0].inputArray
 
         for productNumber in range(1, len(self.thingsToBeTensored)):
 
             xLengthA = Product.shape[0]
-            if len(self.thingsToBeTensored[productNumber].shape) == 1:
+            if len(self.thingsToBeTensored[productNumber].inputArray.shape) == 1:
                 yLengthA = 1
             else:
                 yLengthA = Product.shape[1]
 
-            xLengthB = self.thingsToBeTensored[productNumber].shape[0]
-            if len(self.thingsToBeTensored[productNumber].shape) == 1:
+            xLengthB = self.thingsToBeTensored[productNumber].inputArray.shape[0]
+            if len(self.thingsToBeTensored[productNumber].inputArray.shape) == 1:
                 yLengthB = 1
             else:
                 # print(self.thingsToBeTensored[productNumber].shape, len(
                 #   self.thingsToBeTensored[productNumber].shape))
-                yLengthB = self.thingsToBeTensored[productNumber].shape[1]
+                yLengthB = self.thingsToBeTensored[productNumber].inputArray.shape[1]
 
             # Following the notation of the docstring, Product is A, and self.thingsToBeTensored[productNumber] is B
-            BMatrix = self.thingsToBeTensored[productNumber]
+            BMatrix = self.thingsToBeTensored[productNumber].inputArray
 
             # Find the shape of the product
             newShape = (xLengthA * xLengthB, yLengthA * yLengthB)
@@ -95,7 +95,7 @@ class TensorProduct(object):
 
             Product = newProduct
 
-        return Product
+        return DenseMatrix(Product)
 
     def sparseTensorProduct(self):
         """
@@ -114,11 +114,11 @@ class TensorProduct(object):
         """
 
         # Initialise the product
-        Product = self.thingsToBeTensored[0]
+        Product = self.thingsToBeTensored[0].Elements
 
         for productNumber in range(1, len(self.thingsToBeTensored)):
 
-            BMatrix = self.thingsToBeTensored[productNumber]
+            BMatrix = self.thingsToBeTensored[productNumber].Elements
 
             newShape = (len(Product[0]) * len(BMatrix[0]),
                         len(Product[1]) * len(BMatrix[1]))
@@ -136,24 +136,37 @@ class TensorProduct(object):
                     newProduct.append((i, j, val))
 
             Product = newProduct
+            ProductDimension = 1
+            for i in self.thingsToBeTensored:
+                ProductDimension = ProductDimension*(i.Dimension)
 
-        return Product
+        return SparseMatrix(ProductDimension, Product)
 
 
 # Test Code
 """
-A = [[0,0,1],[0,1,1],[1,0,1],[1,1,-1]]
-B = [[0,0,1],[0,1,1],[1,0,1],[1,1,-1]]
-C = [[0,0,1],[1,1,1]]
+A = DenseMatrix(np.array([[3, 0, 1], [1, 0, 0], [0, 0, 6]]))
+B = DenseMatrix(np.array([[3, 0, 1], [1, 0, 0], [0, 0, 6]]))
+C = DenseMatrix(np.array([[3, 0, 1], [1, 0, 0], [0, 0, 6]]))
 
 ATensorB = TensorProduct([A,C,B])
 
 print(ATensorB.tensorProduct())
 print("------------------")
-
+"""
+"""
 A = np.array([[1,1],[1,-1]])
 B = np.array([[1,1],[1,-1]]) 
 C = np.eye(2)
 
 print(np.kron(np.kron(A,C),B))
+"""
+
+"""
+A = SparseMatrix(3, [[0,0,1],[1,2,1],[2,1,1]])
+B = SparseMatrix(3, [[0,1,1],[1,0,1],[2,2,1]])
+C = SparseMatrix(2, [[0,0,1],[1,1,1]])
+
+ATensorB = TensorProduct([A,B,C])
+print(ATensorB.sparseTensorProduct()) 
 """
