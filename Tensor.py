@@ -83,8 +83,11 @@ class TensorProduct(object):
                     
                     p = i % xLengthB
                     q = j % yLengthB
-                    
-                    newProduct[i][j] = Product[n][m] * BMatrix[p][q]
+
+                    if newShape[1] == 1:
+                        newProduct[i] = Product[n] * BMatrix[p]
+                    else:
+                        newProduct[i][j] = Product[n][m] * BMatrix[p][q]
                     
             
             Product = newProduct
