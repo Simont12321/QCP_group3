@@ -136,9 +136,10 @@ class TensorProduct(object):
                     newProduct.append((i, j, val))
 
             Product = newProduct
-            ProductDimension = 1
-            for i in self.thingsToBeTensored:
-                ProductDimension = ProductDimension*(i.Dimension)
+
+        ProductDimension = 1
+        for i in self.thingsToBeTensored:
+            ProductDimension = ProductDimension*(i.Dimension)
 
         return SparseMatrix(ProductDimension, Product)
 
@@ -162,11 +163,13 @@ C = np.eye(2)
 print(np.kron(np.kron(A,C),B))
 """
 
-"""
+
+hadamard = 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
+H = DenseMatrix(hadamard).Sparse()
 A = SparseMatrix(3, [[0,0,1],[1,2,1],[2,1,1]])
 B = SparseMatrix(3, [[0,1,1],[1,0,1],[2,2,1]])
 C = SparseMatrix(2, [[0,0,1],[1,1,1]])
 
-ATensorB = TensorProduct([A,B,C])
-print(ATensorB.sparseTensorProduct()) 
-"""
+TensorList = TensorProduct([H,A])
+print(TensorList.sparseTensorProduct()) 
+# Result should be a 4x4 matrix but it isn't?

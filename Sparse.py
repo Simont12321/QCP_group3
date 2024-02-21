@@ -83,9 +83,10 @@ class SparseMatrix(object):
             print += f'{i}\n'
         return print
 
+"""
 Matrix = SparseMatrix(3,[(0,0,2),(1,2,3),(2,2,1)])
 NewMatrix = Matrix.Multiply(Matrix)
 print(NewMatrix)
 print(NewMatrix.Dense())
-
+"""
     

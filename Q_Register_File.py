@@ -2,7 +2,8 @@ import numpy as np
 from Apply_File import Apply
 from Gate_File import Gate
 from Tensor import TensorProduct
-
+from Dense import DenseMatrix
+from Sparse import SparseMatrix
 H_gate = 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
 
 
@@ -72,42 +73,76 @@ class Q_Register:
                 temp.append(Qubit())
 
             self.state[0] = 1
+            self.state = DenseMatrix(self.state)
 
         else:
-            # semiProd = np.array([1])
             to_tens_prod = []
             for i in range(n):
 
                 temp.append(Qubit(states[2*i: 2*(i+1)]))
-                to_tens_prod.append(temp[i].state)
-                # semiProd = np.kron(semiProd, temp[i].state)
+                to_tens_prod.append(DenseMatrix(temp[i].state))
 
-            self.state = TensorProduct(to_tens_prod).denseTensorProduct()
-            self.state = np.squeeze(self.state)
+            self.state = np.squeeze(TensorProduct(to_tens_prod).denseTensorProduct().inputArray)
         self.qubits = np.array(temp)
 
     def apply_gate(self, gate: Gate, index):
         """
-        Applies gate to index^th qubit and return the new state of the Q_Register
+        Applies gate to qubit/qubits in index and return the new state of the Q_Register
 
         Arg:
-        gate (ND squaere matrix) : matrix representation of the gate
-        index (int) : qubit index that the gate should be applied to
+        gate : matrix representation of the gate
+        index (list) : qubit index that the gate should be applied to
 
         Returns:
-        ND matrix where N is the initial number of qubits
+        The register with the modified state
         """
+        
 
         # TODO: we assume the gate is compatible with the register
         # -> qRegState is of size 2**n * 1 and gate 2**n * 2**n
 
-        if gate.matrixType == "Sparse":
-            self.state = gate.GateMatrix.SparseApply(self.state)
-        elif gate.matrixType == "Dense":
-            self.state = gate.GateMatrix.DenseApply(self.state)
-        else:  # Lazy ?????
-            pass
-        pass
+        QubitNum = self.n
+        State = self.state
+        TensorList = []
+
+        if gate.gateName != "cNot" and gate.gateName != "cV":
+            if gate.matrixType == "Sparse":
+                Identity = SparseMatrix(2, [[0,0,1],[1,1,1]])
+                for i in range(QubitNum):
+                    TensorList.append(Identity)
+                for num in index:
+                    TensorList[num] = gate.GateMatrix
+                TensorGate = TensorProduct(TensorList).sparseTensorProduct()
+
+                NewState = TensorGate.SparseApply(State)
+                return NewState
+            
+            elif gate.matrixType == "Dense":
+                Identity = DenseMatrix(np.array([[1,0],[0,1]]))
+                for i in range(QubitNum):
+                    TensorList.append(Identity)
+                for num in index:
+                    TensorList[num] = gate.GateMatrix
+                TensorGate = TensorProduct(TensorList).denseTensorProduct()
+
+                NewState = TensorGate.DenseApply(State)
+                return NewState
+            
+            else:  # Lazy ?????
+                pass
+        else:
+            Control = index[0]
+            Target = index[1]
+            SwapMatrixElements =[]
+            for i in range(QubitNum):
+                SwapMatrixElements.append([i,i,1])
+            SwapMatrixElements[0] = [0, Control, 1]
+            SwapMatrixElements[1] = [1, Target, 1]
+            SwapMatrixElements[Control] = [Control, 0, 1]
+            SwapMatrixElements[Target] = [Target, 1, 1]
+            SwapMatrix = SparseMatrix()
+
+
 
     def measure(self):
         """
@@ -128,8 +163,12 @@ class Q_Register:
 
 a = np.array([1+1j, 2+2j], dtype=complex)
 b = np.array([3+3j, 4+4j], dtype=complex)
-q = Q_Register(4, np.array([1+0j, 0j, 1+0j, 0j, 1+0j, 0j, 1+0j, 0j]))
-print(q)
+q = Q_Register(4, np.array([0j, 1+0j, 1+0j, 0j, 1+0j, 0j, 1+0j, 0j]))
+
+
 print(q.state)
-q.measure()
-print(q)
+
+"""
+HGate = Gate("Sparse", "hadamard")
+NewStateq = q.apply_gate(HGate, [0,3])
+"""

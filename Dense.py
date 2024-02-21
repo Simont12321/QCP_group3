@@ -106,6 +106,7 @@ class DenseMatrix():
         return str(np.asmatrix(self.inputArray))
 
 
+"""
 if __name__ == "__main__":
     a = np.array([[3, 0, 1], [1, 0, 0], [0, 0, 6]])
     b = 2
@@ -123,3 +124,4 @@ if __name__ == "__main__":
     print(product)
     print(apply)
     print(matrixC.Sparse())
+"""

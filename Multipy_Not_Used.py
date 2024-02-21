@@ -66,6 +66,7 @@ class Multiply():
         return result
         
 
+"""
 if __name__ == "__main__":
     a = np.array([[3,0,1],[1,0,0],[0,0,6]])
     b = np.array([[1,0,1],[0,2,0],[1,0,3]])
@@ -80,3 +81,4 @@ if __name__ == "__main__":
     lazy1Multiply2 = Multiply(sparceMatrix1,sparceMatrix2)
     lazyResult = lazy1Multiply2.sparceMultiply()
     print(f"The sparce matrix result is {lazyResult}")
+"""
