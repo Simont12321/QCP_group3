@@ -4,22 +4,18 @@ import numpy as np
 
 class TensorProduct(object):
     
-    def __init__(self, thingsToBeTensored, matrixType):
+    def __init__(self, thingsToBeTensored):
         
         assert isinstance(thingsToBeTensored, list), "The primary input for the tensor product method should be passed as a list."
         
         #Check that we're inputting only vectors or only matrices
         if(all(isinstance(matrix, np.ndarray) for matrix in thingsToBeTensored)):
-           self.productType = "Operators"
+           self.tensorProduct = self.denseTensorProduct
         elif(all(isinstance(matrix, list) for matrix in thingsToBeTensored)):
-           self.productType = "Operators"
+           self.tensorProduct = self.sparseTensorProduct
         else:
            raise Exception("The inputs for a tensor product should ALL be numpy arrays or lists.")
-        
-        if matrixType == "Sparse":
-            self.tensorProduct = self.sparseTensorProduct
-        else:
-            self.tensorProduct = self.denseTensorProduct
+
         
         self.thingsToBeTensored = thingsToBeTensored
         
@@ -136,7 +132,7 @@ A = [[0,0,1],[0,1,1],[1,0,1],[1,1,-1]]
 B = [[0,0,1],[0,1,1],[1,0,1],[1,1,-1]]
 C = [[0,0,1],[1,1,1]]
 
-ATensorB = TensorProduct([A,C,B], "Sparse")
+ATensorB = TensorProduct([A,C,B])
 
 print(ATensorB.tensorProduct())
 print("------------------")
