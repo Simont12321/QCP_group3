@@ -1,21 +1,23 @@
-# written by Simon 
+# written by Simon
 import numpy as np
 from Sparse import SparseMatrix
 
+
 class DenseMatrix():
 
-    def __init__(self, inputArray, shape = None):
+    def __init__(self, inputArray, shape=None):
         """
         Input
         ------
         A numpy array. If input is not a numpy array it is converted and a warning message appears. 
         """
         if not isinstance(inputArray, np.ndarray):
-            print(f"Warning, had to convert DenseMatrix primary input from a {type(inputArray)} into a numpy array.") 
+            print(
+                f"Warning, had to convert DenseMatrix primary input from a {type(inputArray)} into a numpy array.")
             inputArray = np.array(inputArray)
 
-        self.inputArray = inputArray 
-        self.shape = np.shape(inputArray) 
+        self.inputArray = inputArray
+        self.shape = np.shape(inputArray)
 
     def Scale(self, factor):
         """
@@ -28,7 +30,8 @@ class DenseMatrix():
         Nothing, modifies the original matrix. 
         """
 
-        assert isinstance(factor, (int, float)), "DenseMatrix scale method expects an int or float input scalar."
+        assert isinstance(
+            factor, (int, float)), "DenseMatrix scale method expects an int or float input scalar."
 
         self.inputArray = np.asmatrix(self.inputArray) * factor
 
@@ -43,13 +46,15 @@ class DenseMatrix():
         The product of the two input matrices as a DenseMatrix. 
         """
 
-        assert isinstance(matrix2, DenseMatrix), "DenseMatrix multiply method expects DenseMatrix input."
+        assert isinstance(
+            matrix2, DenseMatrix), "DenseMatrix multiply method expects DenseMatrix input."
 
-        product = np.asmatrix(self.inputArray) * np.asmatrix(matrix2.inputArray)
-        array = np.asarray(product) 
+        product = np.asmatrix(self.inputArray) * \
+            np.asmatrix(matrix2.inputArray)
+        array = np.asarray(product)
         return DenseMatrix(array)
-    
-    def Apply(self,u):
+
+    def DenseApply(self, u):
         """
         Input
         ------
@@ -73,12 +78,12 @@ class DenseMatrix():
 
         for i in self.inputArray:
             NewVectorelem = 0
-            for j in range(0,self.shape[1]):
+            for j in range(0, self.shape[1]):
                 NewVectorelem += i[j]*u[j]
             NewVector.append(NewVectorelem)
-        NewVector = np.asarray(NewVector, dtype = complex)
-        return(NewVector)
-    
+        NewVector = np.asarray(NewVector, dtype=complex)
+        return (NewVector)
+
     def Sparse(self):
         """
         Output
@@ -91,31 +96,30 @@ class DenseMatrix():
 
         for i in self.inputArray:
             rownum += 1
-            for j in range(0,n):
+            for j in range(0, n):
                 if i[j] != 0:
                     elem = [rownum, j, i[j]]
                     elements.append(elem)
-        return(SparseMatrix(n, elements))
+        return (SparseMatrix(n, elements))
 
     def __str__(self):
         return str(np.asmatrix(self.inputArray))
 
 
 if __name__ == "__main__":
-    a = np.array([[3,0,1],[1,0,0],[0,0,6]])
+    a = np.array([[3, 0, 1], [1, 0, 0], [0, 0, 6]])
     b = 2
-    c = [[3,0,1],[1,0,0],[0,0,6]]
-    d = (3,1,2)
+    c = [[3, 0, 1], [1, 0, 0], [0, 0, 6]]
+    d = (3, 1, 2)
 
-    matrixA = DenseMatrix(a) 
+    matrixA = DenseMatrix(a)
     matrixA.Scale(b)
     print(matrixA)
 
     matrixC = DenseMatrix(c)
     product = matrixA.Multiply(matrixC)
-    apply = matrixC.Apply(d)
+    apply = matrixC.DenseApply(d)
 
-    
     print(product)
     print(apply)
     print(matrixC.Sparse())

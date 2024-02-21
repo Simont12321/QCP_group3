@@ -1,5 +1,6 @@
 import numpy as np
-import Apply_File
+from Apply_File import Apply
+from Gate_File import Gate
 # from Tensor import TensorProduct
 
 H_gate = 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
@@ -33,7 +34,7 @@ class Qubit:
         gate (2D array) : square matrix repesentig a quantum gate (lin operator)
         """
 
-        temp = Apply_File([gate, self.state])
+        temp = Apply([gate, self.state])
         self.state = temp.DenseApply()
 
     def measure(self):
@@ -61,6 +62,7 @@ class Q_Register:
         Args:
         n (int) : number of qubits
         """
+        self.n = n
         self.state = np.zeros(2**n, dtype=complex)
         temp = []
 
@@ -84,7 +86,7 @@ class Q_Register:
             self.state = semiProd.copy()
         self.qubits = np.array(temp)
 
-    def apply_gate(self, gate, index):
+    def apply_gate(self, gate: Gate, index):
         """
         Applies gate to index^th qubit and return the new state of the Q_Register
 
@@ -96,7 +98,15 @@ class Q_Register:
         ND matrix where N is the initial number of qubits
         """
 
-        # TODO: how do are we gonna differ between 1 bit and 2 bit gates? have 2 sep methods ?
+        # TODO: we assume the gate is compatible with the register
+        # -> qRegState is of size 2**n * 1 and gate 2**n * 2**n
+
+        if gate.matrixType == "Sparse":
+            self.state = gate.GateMatrix.SparseApply(self.state)
+        elif gate.matrixType == "Dense":
+            self.state = gate.GateMatrix.DenseApply(self.state)
+        else:  # Lazy ?????
+            pass
         pass
 
     def measure(self):
@@ -112,7 +122,8 @@ class Q_Register:
         out = f""
         for x in self.qubits:
             out += f"{x.state}"
-        return out.replace(" ", ", ").replace("][", ", ")
+
+        return out.replace("][", "] [")
 
 
 a = np.array([1+1j, 2+2j], dtype=complex)
