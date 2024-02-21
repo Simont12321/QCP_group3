@@ -62,7 +62,7 @@ class TensorProduct(object):
             
             xLengthB = self.thingsToBeTensored[productNumber].shape[0]
             if len(Product.shape) == 1:
-                yLengthA = 1
+                yLengthB = 1
             else:
                 yLengthB = self.thingsToBeTensored[productNumber].shape[1]            
             
