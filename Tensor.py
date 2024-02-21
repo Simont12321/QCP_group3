@@ -55,10 +55,16 @@ class TensorProduct(object):
         for productNumber in range(1, len(self.thingsToBeTensored)):
             
             xLengthA = Product.shape[0]
-            yLengthA = Product.shape[1]
+            if len(Product.shape) == 1:
+                yLengthA = 1
+            else:
+                yLengthA = Product.shape[1]
             
             xLengthB = self.thingsToBeTensored[productNumber].shape[0]
-            yLengthB = self.thingsToBeTensored[productNumber].shape[1]
+            if len(Product.shape) == 1:
+                yLengthA = 1
+            else:
+                yLengthB = self.thingsToBeTensored[productNumber].shape[1]            
             
             #Following the notation of the docstring, Product is A, and self.thingsToBeTensored[productNumber] is B
             BMatrix = self.thingsToBeTensored[productNumber]
