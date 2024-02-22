@@ -169,12 +169,14 @@ class Q_Register:
 
 a = np.array([1+1j, 2+2j], dtype=complex)
 b = np.array([3+3j, 4+4j], dtype=complex)
-q = Q_Register(4, np.array([0j, 1+0j, 1+0j, 0j, 1+0j, 0j, 1+0j, 0j]))
+q = Q_Register(4, np.array([1+0j, 0j, 1+0j, 0j, 1+0j, 0j, 1+0j, 0j]))
 
 
 print(q.state)
 
-"""
+
 HGate = Gate("Sparse", "hadamard")
-NewStateq = q.apply_gate(HGate, [0,3])
-"""
+NewStateq = q.apply_gate(HGate, [0])
+
+print(NewStateq)
+

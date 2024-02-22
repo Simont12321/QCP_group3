@@ -9,7 +9,7 @@ class TensorProduct(object):
         assert isinstance(thingsToBeTensored, list), "The primary input for the tensor product method should be passed as a list."
         
         #Check that we're inputting only vectors or only matrices
-        if(all(isinstance(matrix, np.ndarray) for matrix in thingsToBeTensored)):
+        if(all(isinstance(matrix, DenseMatrix) for matrix in thingsToBeTensored)):
            self.tensorProduct = self.denseTensorProduct
         elif(all(isinstance(matrix, SparseMatrix) for matrix in thingsToBeTensored)):
            self.tensorProduct = self.sparseTensorProduct
@@ -50,18 +50,27 @@ class TensorProduct(object):
         """
         
         #Initialise the product 
-        Product = self.thingsToBeTensored[0]
+        Product = np.array(self.thingsToBeTensored[0].inputArray)
         
         for productNumber in range(1, len(self.thingsToBeTensored)):
+
+
+            if len(self.thingsToBeTensored[productNumber].inputArray.shape) == 1:
+                yLengthA = 1
+            else:
+                yLengthA = Product.shape[1]
             
             xLengthA = Product.shape[0]
-            yLengthA = Product.shape[1]
             
-            xLengthB = self.thingsToBeTensored[productNumber].shape[0]
-            yLengthB = self.thingsToBeTensored[productNumber].shape[1]
+            
+            xLengthB = self.thingsToBeTensored[productNumber].inputArray.shape[0]
+            if len(self.thingsToBeTensored[productNumber].inputArray.shape) == 1:
+                yLengthB = 1
+            else:
+                yLengthB = self.thingsToBeTensored[productNumber].inputArray.shape[1]
             
             #Following the notation of the docstring, Product is A, and self.thingsToBeTensored[productNumber] is B
-            BMatrix = self.thingsToBeTensored[productNumber]
+            BMatrix = self.thingsToBeTensored[productNumber].inputArray
             
             #Find the shape of the product
             newShape = (xLengthA * xLengthB, yLengthA * yLengthB)
@@ -78,12 +87,15 @@ class TensorProduct(object):
                     p = i % xLengthB
                     q = j % yLengthB
                     
-                    newProduct[i][j] = Product[n][m] * BMatrix[p][q]
+                    if newShape[1] == 1:
+                        newProduct[i] = Product[n] * BMatrix[p]
+                    else:
+                        newProduct[i][j] = Product[n][m] * BMatrix[p][q]
                     
             
             Product = newProduct
             
-        return Product
+        return DenseMatrix(Product)
     
     def sparseTensorProduct(self):
         """
@@ -143,4 +155,11 @@ B = np.array([[1,1],[1,-1]])
 C = np.eye(2)
 
 print(np.kron(np.kron(np.kron(A,C),B),C))
+"""
+"""
+
+A = DenseMatrix(np.sqrt(1/2)*np.array([1,1]))
+B = DenseMatrix(np.array([1,0]))
+ATensorB = TensorProduct([A,B,B,B])
+print(np.squeeze(ATensorB.denseTensorProduct().inputArray))
 """
