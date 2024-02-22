@@ -1,6 +1,6 @@
 import numpy as np
 from Apply_File import Apply
-from Gate_File import Gate
+from Gate_File import Gate, SwapMatrix1a
 from Tensor import TensorProduct
 from Dense import DenseMatrix
 from Sparse import SparseMatrix
@@ -118,6 +118,7 @@ class Q_Register:
                 TensorGate = TensorProduct(TensorList).sparseTensorProduct()
 
                 NewState = TensorGate.SparseApply(State)
+                self.state = NewState
                 return NewState
 
             elif gate.matrixType == "Dense":
@@ -129,6 +130,7 @@ class Q_Register:
                 TensorGate = TensorProduct(TensorList).denseTensorProduct()
 
                 NewState = TensorGate.DenseApply(State)
+                self.state = NewState
                 return NewState
 
             else:  # Lazy ?????
@@ -136,14 +138,73 @@ class Q_Register:
         else:
             Control = index[0]
             Target = index[1]
-            SwapMatrixElements = []
-            for i in range(QubitNum):
+            Identity = SparseMatrix(2, [[0,0,1],[1,1,1]])
+            if Control == 0:
+                SwapMatrixControl = DenseMatrix(np.eye(2**QubitNum)).Sparse()
+            else:
+                SwapMatrixControl = SwapMatrix1a(QubitNum, Control)
+            if Target == 1:
+                SwapMatrixTarget = DenseMatrix(np.eye(2**QubitNum)).Sparse()
+            else:
+                SwapMatrixTarget = TensorProduct([Identity,SwapMatrix1a(QubitNum-1, Target-1)]).sparseTensorProduct()
+            SwapMatrixForward = SwapMatrixTarget.Multiply(SwapMatrixControl)
+            SwapMatrixBackward = SwapMatrixControl.Multiply(SwapMatrixTarget)
+
+
+            """
+            for i in range(2**QubitNum):
                 SwapMatrixElements.append([i, i, 1])
+
+            # |0> part of qubit switch
             SwapMatrixElements[0] = [0, Control, 1]
             SwapMatrixElements[1] = [1, Target, 1]
             SwapMatrixElements[Control] = [Control, 0, 1]
             SwapMatrixElements[Target] = [Target, 1, 1]
-            SwapMatrix = SparseMatrix()
+
+            # |1> part of qubit switch
+            SwapMatrixElements[2**(QubitNum-1)] = [2**(QubitNum-1), 2**(QubitNum-1)+Control, 1]
+            SwapMatrixElements[2**(QubitNum-1)+1] = [2**(QubitNum-1)+1, 2**(QubitNum-1)+Target, 1]
+            SwapMatrixElements[2**(QubitNum-1)+Control] = [2**(QubitNum-1)+Control, 2**(QubitNum-1), 1]
+            SwapMatrixElements[2**(QubitNum-1)+Target] = [2**(QubitNum-1)+Target, 2**(QubitNum-1)+1, 1]
+
+            SwapMatrix = SparseMatrix(2**QubitNum,SwapMatrixElements)
+            print(SwapMatrixElements)
+            """
+            if gate.matrixType == "Sparse":
+                for i in range(QubitNum-1):
+                    TensorList.append(Identity)
+                TensorList[0] = gate.GateMatrix
+                TensorGate = TensorProduct(TensorList).sparseTensorProduct()
+
+                NewState1 = SwapMatrixForward.SparseApply(State)
+                print(NewState1)
+                NewState2 = TensorGate.SparseApply(NewState1)
+                print(NewState2)
+                NewState = SwapMatrixBackward.SparseApply(NewState2)
+                self.state = NewState
+                return NewState
+            
+            elif gate.matrixType == "Dense":
+                DenseSwapForward = DenseMatrix(SwapMatrixForward.Dense())
+                DenseSwapBackward = DenseMatrix(SwapMatrixBackward.Dense())
+                Identity = DenseMatrix(np.array([[1, 0], [0, 1]]))
+                for i in range(QubitNum-1):
+                    TensorList.append(Identity)
+                TensorList[0] = gate.GateMatrix
+                TensorGate = TensorProduct(TensorList).denseTensorProduct()
+
+                NewState1 = DenseSwapForward.DenseApply(State)
+                NewState2 = TensorGate.DenseApply(NewState1)
+                NewState = DenseSwapBackward.DenseApply(NewState2)
+                self.state = NewState
+                return NewState
+            
+            else:  # Lazy ?????
+                pass
+
+
+
+
 
     def measure(self):
         """
@@ -169,14 +230,14 @@ class Q_Register:
 
 a = np.array([1+1j, 2+2j], dtype=complex)
 b = np.array([3+3j, 4+4j], dtype=complex)
-q = Q_Register(4, np.array([1+0j, 0j, 1+0j, 0j, 1+0j, 0j, 1+0j, 0j]))
+q = Q_Register(3, np.array([1+0j, 0j, 0j, 1+0j, 1+0j, 0j]))
 
 
 print(q.state)
 
 
-HGate = Gate("Sparse", "hadamard")
-NewStateq = q.apply_gate(HGate, [0])
+HGate = Gate("Sparse", "cNot")
+q.apply_gate(HGate, [1,2])
 
-print(NewStateq)
+print(q.state)
 
