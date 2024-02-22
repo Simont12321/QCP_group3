@@ -5,6 +5,18 @@ from Tensor import TensorProduct
 from LazyMatrix_File import LazyMatrix
 
 def SwapMatrix1a(dim, a):
+    """
+    Defines a sparse matrix that swaps qubit in index 0 with qubit in index a in a qunatum register with dim qubits.
+
+    Input
+    ------
+    dim = Number of qubits in register
+    a = Index of qubit to swap with first qubit
+
+    Output
+    ------
+    SwapMatrix = SparseMatrix that swaps qubit in index a with qubit in index 0
+    """
     SwapSmall = SparseMatrix(4,[[0,0,1],[1,2,1],[2,1,1],[3,3,1]])
     if dim == 2:
         SwapMatrix = SwapSmall

@@ -95,7 +95,7 @@ class Q_Register:
 
         Arg:
         gate : matrix representation of the gate
-        index (list) : qubit index that the gate should be applied to
+        index (list) : qubit index that the gate should be applied to (NOTE If gate is cNot/cV, first index in list is control, second is target)
 
         Returns:
         The register with the modified state
@@ -150,26 +150,6 @@ class Q_Register:
             SwapMatrixForward = SwapMatrixTarget.Multiply(SwapMatrixControl)
             SwapMatrixBackward = SwapMatrixControl.Multiply(SwapMatrixTarget)
 
-
-            """
-            for i in range(2**QubitNum):
-                SwapMatrixElements.append([i, i, 1])
-
-            # |0> part of qubit switch
-            SwapMatrixElements[0] = [0, Control, 1]
-            SwapMatrixElements[1] = [1, Target, 1]
-            SwapMatrixElements[Control] = [Control, 0, 1]
-            SwapMatrixElements[Target] = [Target, 1, 1]
-
-            # |1> part of qubit switch
-            SwapMatrixElements[2**(QubitNum-1)] = [2**(QubitNum-1), 2**(QubitNum-1)+Control, 1]
-            SwapMatrixElements[2**(QubitNum-1)+1] = [2**(QubitNum-1)+1, 2**(QubitNum-1)+Target, 1]
-            SwapMatrixElements[2**(QubitNum-1)+Control] = [2**(QubitNum-1)+Control, 2**(QubitNum-1), 1]
-            SwapMatrixElements[2**(QubitNum-1)+Target] = [2**(QubitNum-1)+Target, 2**(QubitNum-1)+1, 1]
-
-            SwapMatrix = SparseMatrix(2**QubitNum,SwapMatrixElements)
-            print(SwapMatrixElements)
-            """
             if gate.matrixType == "Sparse":
                 for i in range(QubitNum-1):
                     TensorList.append(Identity)
@@ -177,9 +157,7 @@ class Q_Register:
                 TensorGate = TensorProduct(TensorList).sparseTensorProduct()
 
                 NewState1 = SwapMatrixForward.SparseApply(State)
-                print(NewState1)
                 NewState2 = TensorGate.SparseApply(NewState1)
-                print(NewState2)
                 NewState = SwapMatrixBackward.SparseApply(NewState2)
                 self.state = NewState
                 return NewState
@@ -236,8 +214,8 @@ q = Q_Register(3, np.array([1+0j, 0j, 0j, 1+0j, 1+0j, 0j]))
 print(q.state)
 
 
-HGate = Gate("Sparse", "cNot")
-q.apply_gate(HGate, [1,2])
+HGate = Gate("Dense", "cNot")
+q.apply_gate(HGate, [2,1])
 
 print(q.state)
 
