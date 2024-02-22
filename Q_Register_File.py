@@ -63,9 +63,12 @@ class Q_Register:
         Args:
         n (int) : number of qubits
         """
+
         self.n = n
         self.state = np.zeros(2**n, dtype=complex)
         temp = []
+
+        # TODO: is it a problem that the quibits are normalized individually when they are initialized?
 
         if np.all(states) == None:
             for i in range(n):
@@ -82,7 +85,8 @@ class Q_Register:
                 temp.append(Qubit(states[2*i: 2*(i+1)]))
                 to_tens_prod.append(DenseMatrix(temp[i].state))
 
-            self.state = np.squeeze(TensorProduct(to_tens_prod).denseTensorProduct().inputArray)
+            self.state = np.squeeze(TensorProduct(
+                to_tens_prod).denseTensorProduct().inputArray)
         self.qubits = np.array(temp)
 
     def apply_gate(self, gate: Gate, index):
@@ -96,7 +100,6 @@ class Q_Register:
         Returns:
         The register with the modified state
         """
-        
 
         # TODO: we assume the gate is compatible with the register
         # -> qRegState is of size 2**n * 1 and gate 2**n * 2**n
@@ -107,7 +110,7 @@ class Q_Register:
 
         if gate.gateName != "cNot" and gate.gateName != "cV":
             if gate.matrixType == "Sparse":
-                Identity = SparseMatrix(2, [[0,0,1],[1,1,1]])
+                Identity = SparseMatrix(2, [[0, 0, 1], [1, 1, 1]])
                 for i in range(QubitNum):
                     TensorList.append(Identity)
                 for num in index:
@@ -116,9 +119,9 @@ class Q_Register:
 
                 NewState = TensorGate.SparseApply(State)
                 return NewState
-            
+
             elif gate.matrixType == "Dense":
-                Identity = DenseMatrix(np.array([[1,0],[0,1]]))
+                Identity = DenseMatrix(np.array([[1, 0], [0, 1]]))
                 for i in range(QubitNum):
                     TensorList.append(Identity)
                 for num in index:
@@ -127,32 +130,35 @@ class Q_Register:
 
                 NewState = TensorGate.DenseApply(State)
                 return NewState
-            
+
             else:  # Lazy ?????
                 pass
         else:
             Control = index[0]
             Target = index[1]
-            SwapMatrixElements =[]
+            SwapMatrixElements = []
             for i in range(QubitNum):
-                SwapMatrixElements.append([i,i,1])
+                SwapMatrixElements.append([i, i, 1])
             SwapMatrixElements[0] = [0, Control, 1]
             SwapMatrixElements[1] = [1, Target, 1]
             SwapMatrixElements[Control] = [Control, 0, 1]
             SwapMatrixElements[Target] = [Target, 1, 1]
             SwapMatrix = SparseMatrix()
 
-
-
     def measure(self):
         """
-        Measurement of the Q_Register, all the qubits collapse into |+> or |->        
+        Measurement of the possibly entagled state of Q_Register,
+        according to the amplitudes, leaving the register in a state
+        that is binary representation of a number between 0 and (2**n)-1       
         """
 
-        for q in self.qubits:
-            q.measure()
+        P = np.array([abs[qb]**2 for qb in self.state])
+        result = np.random.choice(np.arange(len(self.state)), weights=P)[0]
+        collapsed = format(result, "0"+str(len(self.state))+"b")
+        for i in range(len(collapsed)):
+            self.state[i] = collapsed[i]
 
-    def __str__(self) -> str:  # basically converts self.qubits to self.state
+    def __str__(self) -> str:
         # prints the Q_Register as 1D array
         out = f""
         for x in self.qubits:
