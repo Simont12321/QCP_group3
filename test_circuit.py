@@ -12,7 +12,7 @@ register1 = Q_Register(2)
 #print(f"qubits are {register1}.")
 
 # create a hadamard gate to act on register1
-gate1 = Gate(DenseMatrix, register1, hadamard) 
+gate1 = Gate(DenseMatrix, register1, "hadamard") 
 
 # apply the hadamard gate to register1
 register1.apply_gate(gate1) 
