@@ -191,11 +191,11 @@ class Q_Register:
         that is binary representation of a number between 0 and (2**n)-1       
         """
 
-        P = np.array([abs[qb]**2 for qb in self.state])
-        result = np.random.choice(np.arange(len(self.state)), weights=P)[0]
-        collapsed = format(result, "0"+str(len(self.state))+"b")
+        P = np.array([abs(qb)**2 for qb in self.state.inputArray])
+        result = np.random.choice(np.arange(len(self.state.inputArray)), p=P)
+        collapsed = format(result, "0"+str(len(self.state.inputArray))+"b")
         for i in range(len(collapsed)):
-            self.state[i] = collapsed[i]
+            self.state.inputArray[i] = collapsed[i]
 
     def __str__(self) -> str:
         # prints the Q_Register as 1D array
