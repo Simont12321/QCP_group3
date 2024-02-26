@@ -126,10 +126,10 @@ class Q_Register:
                 for i in range(QubitNum):
                     TensorList.append(Identity)
                 for num in index:
-                    TensorList[num] = gate.GateMatrix
+                    TensorList[num] = gate.GateMatrix 
                 TensorGate = TensorProduct(TensorList).denseTensorProduct()
 
-                NewState = TensorGate.DenseApply(State)
+                NewState = TensorGate.DenseApply(State.inputArray)
                 self.state = NewState
                 return NewState
 
@@ -191,11 +191,11 @@ class Q_Register:
         that is binary representation of a number between 0 and (2**n)-1       
         """
 
-        P = np.array([abs(qb)**2 for qb in self.state.inputArray])
-        result = np.random.choice(np.arange(len(self.state.inputArray)), p=P)
-        collapsed = format(result, "0"+str(len(self.state.inputArray))+"b")
+        P = np.array([abs(qb)**2 for qb in self.state]) 
+        result = np.random.choice(np.arange(len(self.state)), p=P)
+        collapsed = format(result, "0"+str(len(self.state))+"b")
         for i in range(len(collapsed)):
-            self.state.inputArray[i] = collapsed[i]
+            self.state[i] = collapsed[i]
 
     def __str__(self) -> str:
         # prints the Q_Register as 1D array
@@ -205,17 +205,17 @@ class Q_Register:
 
         return out.replace("][", "] [")
 
-
-a = np.array([1+1j, 2+2j], dtype=complex)
-b = np.array([3+3j, 4+4j], dtype=complex)
-q = Q_Register(3, np.array([1+0j, 0j, 0j, 1+0j, 1+0j, 0j]))
-
-
-print(q.state)
+if __name__ == "__main__":
+    a = np.array([1+1j, 2+2j], dtype=complex)
+    b = np.array([3+3j, 4+4j], dtype=complex)
+    q = Q_Register(3)
 
 
-HGate = Gate("Dense", "cNot")
-q.apply_gate(HGate, [2,1])
+    print(q.state)
 
-print(q.state)
+
+    HGate = Gate("Dense", "hadamard")
+    q.apply_gate(HGate, [0,1])
+
+    print(q.state)
 
